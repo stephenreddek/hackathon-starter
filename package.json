@@ -13,7 +13,8 @@
     "test": "mocha --reporter spec",
     "postinstall": "npm rebuild node-sass",
     "clean": "rm -f src/**/*.js && rm -f src/**/*.map",
-    "build": "npm run clean && tsc"
+    "build": "npm run clean && tsc",
+    "postbuild": "cp -r src/views built/views"
   },
   "dependencies": {
     "@types/mocha": "^2.2.40",
