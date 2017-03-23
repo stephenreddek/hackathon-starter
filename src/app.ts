@@ -1,3 +1,5 @@
+import Tiny from 'tinypg'
+
 /**
  * Module dependencies.
  */
@@ -45,6 +47,12 @@ const passportConfig = require('./config/passport');
  */
 const app = express();
 
+const db = new Tiny({
+   connection_string: 'postgres://postgres@localhost:5432/test',
+   root_dir: ['./sql_files']
+})
+
+
 /**
  * Connect to MongoDB.
  */
@@ -65,8 +73,8 @@ app.set('view engine', 'pug');
 app.use(expressStatusMonitor());
 app.use(compression());
 app.use(sass({
-  src: path.join(__dirname, '/../public'),
-  dest: path.join(__dirname, '/../public')
+  src: path.join(__dirname, 'public'),
+  dest: path.join(__dirname, 'public')
 }));
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -84,6 +92,12 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use((req, res, next) => {
+  req.db = db
+  next()
+})
+
 app.use(flash());
 app.use((req, res, next) => {
   if (req.path === '/api/upload') {
@@ -112,7 +126,7 @@ app.use((req, res, next) => {
   }
   next();
 });
-app.use(express.static(path.join(__dirname, '/../public'), { maxAge: 31557600000 }));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
 /**
  * Primary app routes.

@@ -16,6 +16,7 @@
         "noUnusedParameters": false
     },
     "include": [
-        "./src/**/*"
+        "./src/**/*",
+        "!./src/public/*"
     ]
 }

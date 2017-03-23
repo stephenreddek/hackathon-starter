@@ -1,15 +1,14 @@
 import * as crypto from 'crypto'
-const bcrypt = require('bcrypt-nodejs')
+import { TinyPg } from 'tinypg'
+import bcrypt from 'bcrypt-nodejs'
 const mongoose = require('mongoose');
 
 export interface User {
-  email: {
-    type: string
-    unique: true 
-  }
+  user_id: number
+  email: string
   password: string
-  passwordResetToken: string
-  passwordResetExpires: Date
+  passwordResetToken?: string
+  passwordResetExpires?: Date
 
   facebook: string
   twitter: string
@@ -29,29 +28,65 @@ export interface User {
   }
 }
 
-// export const save = (ctx, user: User, callback) => {
-//   if (!user.isModified('password')) { return next() }
-//   bcrypt.genSalt(10, (err, salt) => {
-//     if (err) { return next(err) }
-//     bcrypt.hash(user.password, salt, null, (err, hash) => {
-//       if (err) { return next(err) }
-//       user.password = hash
-//       next()
-//     })
-//   })
+export interface UserCreate {
+  email: string
+  password: string
+}
 
-//   ctx.db.sql.user.save(user)
+export class UserService {
+  db: TinyPg
 
-//   callback(user, null)
-// }
+  constructor (db: TinyPg) {
+    this.db = db
+  }
 
+  save(create: UserCreate): Promise<User> {
+    return new Promise((resolve, reject) => {
+      bcrypt.genSalt(10, (err, salt) => {
+        if (err) { reject(err) }
+        
+        return bcrypt.hash(create.password, salt, null, (err, hash) => {
+          if (err) { reject(err) }
+          
+          return this.db.sql<User>('user.save', {
+            email: create.email,
+            password_hash: hash,
+          })
+          .then(res => {
+            resolve(res.rows[0])
+          })
+          .catch(e => {
+            reject(e)
+          })
+        })
+      })
+    })
+  }
 
-module.exports = {};
+  comparePasswords(user: User, password: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, user.password, (err, isMatch) => {
+        if (err) {
+          reject(err)
+        }
+          
+        resolve(isMatch)
+      })
+    })
+  }
 
-module.exports.save = (ctx, user, callback) => {
-  ctx.db.sql.user.save(user)
+  gravatarUrl(user: User, size: number = 200): string {
+    if (!size) {
+      size = 200;
+    }
 
-  callback(user, null)
+    if (user.email.trim() === '') {
+      return `https://gravatar.com/avatar/?s=${size}&d=retro`;
+    }
+
+    const md5 = crypto.createHash('md5').update(user.email).digest('hex');
+    return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
+  }
 }
 
 const userSchema = new mongoose.Schema({

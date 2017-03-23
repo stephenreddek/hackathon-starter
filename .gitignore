@@ -19,6 +19,7 @@ public/css/main.css
 built
 src/**/*.js
 src/**/*.js.map
+!src/public/**/*.js
 
 # API keys and secrets
 .env
