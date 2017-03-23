@@ -1,9 +1,8 @@
 // Place your settings in this file to overwrite default and user settings.
 {
     "files.exclude": {
-        "src/**/*.js": true,
-        "src/**/*.js.map": true,
-        "node_modules": true,
-        "src/public/": false
+        "**/*.js": { "when": "$(basename).ts" },
+        "**/*.js.map": { "when": "$(basename)" },
+        "node_modules": true
     }
 }
