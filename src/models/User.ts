@@ -1,6 +1,58 @@
-const bcrypt = require('bcrypt-nodejs');
-const crypto = require('crypto');
+import * as crypto from 'crypto'
+const bcrypt = require('bcrypt-nodejs')
 const mongoose = require('mongoose');
+
+export interface User {
+  email: {
+    type: string
+    unique: true 
+  }
+  password: string
+  passwordResetToken: string
+  passwordResetExpires: Date
+
+  facebook: string
+  twitter: string
+  google: string
+  github: string
+  instagram: string
+  linkedin: string
+  steam: string
+  tokens: any[]
+
+  profile: {
+    name: string
+    gender: string
+    location: string
+    website: string
+    picture: string
+  }
+}
+
+// export const save = (ctx, user: User, callback) => {
+//   if (!user.isModified('password')) { return next() }
+//   bcrypt.genSalt(10, (err, salt) => {
+//     if (err) { return next(err) }
+//     bcrypt.hash(user.password, salt, null, (err, hash) => {
+//       if (err) { return next(err) }
+//       user.password = hash
+//       next()
+//     })
+//   })
+
+//   ctx.db.sql.user.save(user)
+
+//   callback(user, null)
+// }
+
+
+module.exports = {};
+
+module.exports.save = (ctx, user, callback) => {
+  ctx.db.sql.user.save(user)
+
+  callback(user, null)
+}
 
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
@@ -65,6 +117,5 @@ userSchema.methods.gravatar = function gravatar(size) {
   return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
 
-const User = mongoose.model('User', userSchema);
+export default mongoose.model('User', userSchema);
 
-module.exports = User;

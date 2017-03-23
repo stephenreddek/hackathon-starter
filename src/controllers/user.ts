@@ -1,14 +1,16 @@
-const bluebird = require('bluebird');
-const crypto = bluebird.promisifyAll(require('crypto'));
-const nodemailer = require('nodemailer');
-const passport = require('passport');
-const User = require('../models/User');
+import * as bluebird from 'bluebird'
+import User from '../models/User'
+
+const nodemailer = require('nodemailer')
+const passport = require('passport')
+
+const crypto = <any>bluebird.promisifyAll(require('crypto'));
 
 /**
  * GET /login
  * Login page.
  */
-exports.getLogin = (req, res) => {
+export const getLogin = (req, res) => {
   if (req.user) {
     return res.redirect('/');
   }
@@ -21,7 +23,7 @@ exports.getLogin = (req, res) => {
  * POST /login
  * Sign in using email and password.
  */
-exports.postLogin = (req, res, next) => {
+export const postLogin = (req, res, next) => {
   req.assert('email', 'Email is not valid').isEmail();
   req.assert('password', 'Password cannot be blank').notEmpty();
   req.sanitize('email').normalizeEmail({ remove_dots: false });
@@ -51,7 +53,7 @@ exports.postLogin = (req, res, next) => {
  * GET /logout
  * Log out.
  */
-exports.logout = (req, res) => {
+export const logout = (req, res) => {
   req.logout();
   res.redirect('/');
 };
@@ -60,7 +62,7 @@ exports.logout = (req, res) => {
  * GET /signup
  * Signup page.
  */
-exports.getSignup = (req, res) => {
+export const getSignup = (req, res) => {
   if (req.user) {
     return res.redirect('/');
   }
@@ -73,7 +75,7 @@ exports.getSignup = (req, res) => {
  * POST /signup
  * Create a new local account.
  */
-exports.postSignup = (req, res, next) => {
+export const postSignup = (req, res, next) => {
   req.assert('email', 'Email is not valid').isEmail();
   req.assert('password', 'Password must be at least 4 characters long').len(4);
   req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
@@ -113,7 +115,7 @@ exports.postSignup = (req, res, next) => {
  * GET /account
  * Profile page.
  */
-exports.getAccount = (req, res) => {
+export const getAccount = (req, res) => {
   res.render('account/profile', {
     title: 'Account Management'
   });
@@ -123,7 +125,7 @@ exports.getAccount = (req, res) => {
  * POST /account/profile
  * Update profile information.
  */
-exports.postUpdateProfile = (req, res, next) => {
+export const postUpdateProfile = (req, res, next) => {
   req.assert('email', 'Please enter a valid email address.').isEmail();
   req.sanitize('email').normalizeEmail({ remove_dots: false });
 
@@ -159,7 +161,7 @@ exports.postUpdateProfile = (req, res, next) => {
  * POST /account/password
  * Update current password.
  */
-exports.postUpdatePassword = (req, res, next) => {
+export const postUpdatePassword = (req, res, next) => {
   req.assert('password', 'Password must be at least 4 characters long').len(4);
   req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
 
@@ -185,7 +187,7 @@ exports.postUpdatePassword = (req, res, next) => {
  * POST /account/delete
  * Delete user account.
  */
-exports.postDeleteAccount = (req, res, next) => {
+export const postDeleteAccount = (req, res, next) => {
   User.remove({ _id: req.user.id }, (err) => {
     if (err) { return next(err); }
     req.logout();
@@ -198,7 +200,7 @@ exports.postDeleteAccount = (req, res, next) => {
  * GET /account/unlink/:provider
  * Unlink OAuth provider.
  */
-exports.getOauthUnlink = (req, res, next) => {
+export const getOauthUnlink = (req, res, next) => {
   const provider = req.params.provider;
   User.findById(req.user.id, (err, user) => {
     if (err) { return next(err); }
@@ -216,7 +218,7 @@ exports.getOauthUnlink = (req, res, next) => {
  * GET /reset/:token
  * Reset Password page.
  */
-exports.getReset = (req, res, next) => {
+export const getReset = (req, res, next) => {
   if (req.isAuthenticated()) {
     return res.redirect('/');
   }
@@ -239,7 +241,7 @@ exports.getReset = (req, res, next) => {
  * POST /reset/:token
  * Process the reset password request.
  */
-exports.postReset = (req, res, next) => {
+export const postReset = (req, res, next) => {
   req.assert('password', 'Password must be at least 4 characters long.').len(4);
   req.assert('confirm', 'Passwords must match.').equals(req.body.password);
 
@@ -287,7 +289,7 @@ exports.postReset = (req, res, next) => {
     };
     return transporter.sendMail(mailOptions)
       .then(() => {
-        req.flash('success', { msg: 'Success! Your password has been changed.' });    
+        req.flash('success', { msg: 'Success! Your password has been changed.' });
       });
   };
 
@@ -301,7 +303,7 @@ exports.postReset = (req, res, next) => {
  * GET /forgot
  * Forgot Password page.
  */
-exports.getForgot = (req, res) => {
+export const getForgot = (req, res) => {
   if (req.isAuthenticated()) {
     return res.redirect('/');
   }
@@ -314,7 +316,7 @@ exports.getForgot = (req, res) => {
  * POST /forgot
  * Create a random token, then the send user an email with a reset link.
  */
-exports.postForgot = (req, res, next) => {
+export const postForgot = (req, res, next) => {
   req.assert('email', 'Please enter a valid email address.').isEmail();
   req.sanitize('email').normalizeEmail({ remove_dots: false });
 
