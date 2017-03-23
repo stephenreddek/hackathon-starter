@@ -1,7 +1,7 @@
 require('source-map-support').install();
 const chalk = require('chalk');
 
-const app = require('./built/app').App;
+const app = require('./src/app').App;
 
 
 /**
