@@ -17,6 +17,8 @@ tmp
 public/css/main.css
 
 built
+src/**/*.js
+src/**/*.js.map
 
 # API keys and secrets
 .env
