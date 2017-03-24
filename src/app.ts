@@ -1,5 +1,3 @@
-import Tiny from 'tinypg'
-
 /**
  * Module dependencies.
  */
@@ -47,12 +45,6 @@ const passportConfig = require('./config/passport');
  */
 const app = express();
 
-const db = new Tiny({
-   connection_string: 'postgres://postgres@localhost:5432/test',
-   root_dir: ['./sql_files']
-})
-
-
 /**
  * Connect to MongoDB.
  */
@@ -92,12 +84,6 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use((req, res, next) => {
-  req.db = db
-  next()
-})
-
 app.use(flash());
 app.use((req, res, next) => {
   if (req.path === '/api/upload') {
